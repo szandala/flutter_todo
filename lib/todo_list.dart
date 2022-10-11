@@ -22,7 +22,11 @@ class _ToDoListState extends State<ToDoList> {
       appBar: AppBar(
         title: const Text("TODO list"),
       ),
-      body: ListView(children: _getToDosListWidgets()),
+      body: ListView.builder(
+          itemCount: _listOfToDos.length,
+          itemBuilder: (context, index) {
+        return _getToDoListCard(index, _listOfToDos[index] );}
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _newToDoPopUp(context),
         tooltip: "Add new TODO",
@@ -31,33 +35,26 @@ class _ToDoListState extends State<ToDoList> {
     );
   }
 
-  List<Widget> _getToDosListWidgets() {
-    // Zmieniam to na listę obiektów w formacie:
-    // (id, string)
-    // by móc edytować po indeksie
-    return _listOfToDos
-        .asMap()
-        .entries
-        .map((it) => Card(
-                child: ListTile(
-              leading: const Icon(
-                Icons.task,
-                color: Colors.deepPurple,
-              ),
-              title: Text("${it.key + 1}. ${it.value}"),
-              hoverColor: Colors.cyan,
-              onTap: () {
-                Future<Object?> editionResult = Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => EditToDo(todoText: it.value)));
-                editionResult.then((value) {
-                  setState(() {
-                    _listOfToDos[it.key] = value as String;
-                  });
-                });
-              },
-            )))
-        .toList();
+  Widget _getToDoListCard(int id, String value){
+    return Card(
+        child: ListTile(
+          leading: const Icon(
+            Icons.task,
+            color: Colors.deepPurple,
+          ),
+          title: Text("${id + 1}. ${value}"),
+          hoverColor: Colors.cyan,
+          onTap: () {
+            Future<Object?> editionResult = Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => EditToDo(todoText: value)));
+            editionResult.then((value) {
+              setState(() {
+                _listOfToDos[id] = value as String;
+              });
+            });
+          },
+        ));
   }
 
   Future<void> _newToDoPopUp(BuildContext context) {
